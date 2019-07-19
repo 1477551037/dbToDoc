@@ -24,9 +24,11 @@ import org.sqlToDoc.util.FreeMarkerUtils;
 
 /** 
  * Description: 生成db doc文档的界面
- * 
- * @author jiujiya
- * @version 1.0 
+ *
+ * @author jiujiya ,haven
+ * @version 1.0
+ * @author haven
+ * @version 1.1
  */
 public class DbDocUI {
 	
@@ -204,7 +206,7 @@ public class DbDocUI {
 		});
 		
 		// 如果数据库名称不为空，自动生成
-		if(!bean.dbNameText.equals("")) {
+		if(!bean.dbNameText.equals("")&&!bean.dbPsText.equals("")) {
 			createDoc();
 		}
 	}
@@ -225,13 +227,14 @@ public class DbDocUI {
 					DBHelper.user = dbUserText.getText();
 					DBHelper.password = dbPsText.getText();
 					DBHelper.url = "jdbc:mysql://" + dbIpText.getText() + ":" + dbPortText.getText() + "/" 
-									+ dbNameText.getText() + "?characterEncoding=utf8";
+									+ dbNameText.getText() + "?characterEncoding=utf8&useOldAliasMetadataBehavior=true";
 					// 初始化模板引擎  
 			    	FreeMarkerUtils.initFreeMarker(bean.ftlBasePath);
 			    	/** 模板引擎所需要的数据Map */
 			    	Map<String,Object> templateData = new HashMap<String, Object>();
 			    	templateData.put("projectName", projectText.getText());
-			    	templateData.put("tables", DBHelper.getTableAndColumns());
+			    	//templateData.put("tables", DBHelper.getTableAndColumns());
+			    	templateData.put("tables", DBHelper.getTableAndColumnsCustomize());
 			    	// 生成word文件
 			    	if("".equals(pathText.getText().trim())) {
 			    		throw new RuntimeException("文档路径不能为空");

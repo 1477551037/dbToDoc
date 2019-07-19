@@ -13,9 +13,11 @@ import java.util.Map;
 
 /** 
  * Description: 数据库工具类
- * 
- * @author jiujiya
- * @version 1.0 
+ *
+ * @author jiujiya ,haven
+ * @version 1.0
+ * @author haven
+ * @version 1.1
  */
 public class DBHelper {
 	
@@ -59,6 +61,24 @@ public class DBHelper {
 			for (Map<String, Object> map : columns) {
 				map.put("IS_NULLABLE", "NO".equals(map.get("IS_NULLABLE")) ? "是" : "否");
 				map.put("COLUMN_KEY", "PRI".equals(map.get("COLUMN_KEY")) ? "是" : "否");
+			}
+			table.put("columns", columns);
+		}
+		return tables;
+	}
+
+
+	public static List<Map<String, Object>> getTableAndColumnsCustomize() {
+		//String sql1 = "SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + DBHelper.dbname + "'";
+		String sql1 = "SELECT table_name AS 'TABLE_NAME',table_name_cn AS 'TABLE_COMMENT' FROM demo_bigdata.t_table_model";
+		List<Map<String, Object>> tables = DBHelper.queryForList(sql1);
+		for (Map<String, Object> table : tables) {
+			// 查询表结构
+			String sql = "SELECT t.data_item_name 'COLUMN_NAME',t.chinese_name 'COLUMN_COMMENT',t.data_type 'COLUMN_TYPE',t.length '字段长度',mt.is_null_able 'IS_NULLABLE',mt.is_pk AS 'COLUMN_KEY' FROM demo_bigdata.`t_table_data_item` mt LEFT JOIN demo_bigdata.t_table_model m ON mt.table_id = m.id LEFT JOIN demo_bigdata.t_data_item_standard t ON mt.data_item_id = t.id WHERE m.table_name =  '" + table.get("TABLE_NAME") + "'";
+			List<Map<String, Object>> columns = DBHelper.queryForList(sql);
+			for (Map<String, Object> map : columns) {
+				map.put("IS_NULLABLE", map.get("IS_NULLABLE")==null ? "是" : "否");
+				map.put("COLUMN_KEY", (boolean)map.get("COLUMN_KEY") ? "是" : "否");
 			}
 			table.put("columns", columns);
 		}
